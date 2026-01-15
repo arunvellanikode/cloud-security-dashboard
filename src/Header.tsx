@@ -1,45 +1,87 @@
 import React from 'react';
 import './Header.css';
 
+interface Log {
+  timestamp: string;
+  level: string;
+  message: string;
+  source: string;
+}
+
 interface HeaderProps {
   onLogout: () => void;
   selectedLogType: string;
   onLogTypeChange: (type: string) => void;
+  logs: Log[];
 }
 
-const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeChange }) => {
+const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeChange, logs }) => {
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onLogTypeChange(e.target.value);
   };
 
+  const handleDownload = () => {
+    const filteredLogs = selectedLogType ? logs.filter(log => log.source.toLowerCase() === selectedLogType) : logs;
+    const csvContent = 'data:text/csv;charset=utf-8,' + 
+      'Timestamp,Level,Message,Source\n' + 
+      filteredLogs.map(log => `${log.timestamp},${log.level},${log.message},${log.source}`).join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `logs_${selectedLogType || 'all'}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <header>
+      <div className="top-bar">
+        <div className="last-logins">
+          Last logins: 2026-01-15 10:00, 2026-01-14 15:30, 2026-01-13 09:15
+        </div>
+        <div className="actions">
+          <button className="button logout small" onClick={onLogout}>🚪 Logout</button>
+        </div>
+      </div>
       <nav>
         <div className="category">
-          <label>Log Sources</label>
-          <select name="logs" id="logs-dropdown" value={selectedLogType} onChange={handleSelectChange}>
-            <option value="">All Logs</option>
-            <option value="suricata">Suricata</option>
-            <option value="clamav">ClamAV</option>
-            <option value="falco">Falco</option>
-          </select>
+          <label>📋 Log Sources</label>
+          <p>Select which security logs to view and filter. Options include Suricata (network intrusion detection), ClamAV (antivirus scanning), and Falco (runtime security monitoring).</p>
+          <div className="radio-group">
+            <label>
+              <input type="radio" name="logs" value="" checked={selectedLogType === ""} onChange={handleSelectChange} />
+              All Logs
+            </label>
+            <label>
+              <input type="radio" name="logs" value="suricata" checked={selectedLogType === "suricata"} onChange={handleSelectChange} />
+              Suricata
+            </label>
+            <label>
+              <input type="radio" name="logs" value="clamav" checked={selectedLogType === "clamav"} onChange={handleSelectChange} />
+              ClamAV
+            </label>
+            <label>
+              <input type="radio" name="logs" value="falco" checked={selectedLogType === "falco"} onChange={handleSelectChange} />
+              Falco
+            </label>
+          </div>
+          <button className="button download" onClick={handleDownload}>📥 Download Logs</button>
         </div>
         <div className="category">
-          <label>Dashboards</label>
-          <a href="https://wazuh-dashboard-url" className="button">Wazuh</a>
-          <a href="https://openvas-dashboard-url" className="button">OpenVAS</a>
+          <label>📊 Dashboards</label>
+          <p>Access external security dashboards for comprehensive threat analysis. Includes Wazuh for security information and event management, and OpenVAS for vulnerability scanning.</p>
+          <a href="https://wazuh-dashboard-url" className="button" target="_blank">📊 Wazuh</a>
+          <a href="https://openvas-dashboard-url" className="button" target="_blank">📊 OpenVAS</a>
         </div>
         <div className="category">
-          <label>SSH Access</label>
-          <a href="ssh://ec2-user@server1" className="button">Server 1</a>
-          <a href="ssh://ec2-user@server2" className="button">Server 2</a>
-          <a href="ssh://ec2-user@server3" className="button">Server 3</a>
-          <a href="ssh://ec2-user@server4" className="button">Server 4</a>
-          <a href="ssh://ec2-user@server5" className="button">Server 5</a>
-        </div>
-        <div className="category">
-          <label>Actions</label>
-          <button className="button logout" onClick={onLogout}>Logout</button>
+          <label>🔐 SSH Access</label>
+          <p>Direct SSH connections to your AWS EC2 instances for server management and troubleshooting. Quick access to 5 configured servers.</p>
+          <a href="ssh://ec2-user@server1" className="button" target="_blank">🖥️ Server 1</a>
+          <a href="ssh://ec2-user@server2" className="button" target="_blank">🖥️ Server 2</a>
+          <a href="ssh://ec2-user@server3" className="button" target="_blank">🖥️ Server 3</a>
+          <a href="ssh://ec2-user@server4" className="button" target="_blank">🖥️ Server 4</a>
+          <a href="ssh://ec2-user@server5" className="button" target="_blank">🖥️ Server 5</a>
         </div>
       </nav>
     </header>

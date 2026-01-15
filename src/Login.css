@@ -1,4 +1,14 @@
 .login-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+}
+
+.login-form {
   max-width: 400px;
   padding: 40px;
   border: none;
@@ -9,7 +19,7 @@
   backdrop-filter: blur(10px);
 }
 
-.login-container h2 {
+.login-form h2 {
   color: #495057;
   margin-bottom: 30px;
   font-size: 1.8em;
@@ -67,14 +77,4 @@ button:hover {
   color: #dc3545;
   margin-bottom: 20px;
   font-weight: 500;
-}
-
-@media (max-width: 768px) {
-  .login-container {
-    max-width: 90%;
-    padding: 20px;
-  }
-  .login-container h2 {
-    font-size: 1.5em;
-  }
 }
