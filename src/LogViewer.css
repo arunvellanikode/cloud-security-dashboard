@@ -1,0 +1,131 @@
+.log-viewer {
+  padding: 30px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  max-width: 1200px;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.log-viewer.highlight-suricata {
+  border: 3px solid #dc3545;
+  box-shadow: 0 15px 35px rgba(220, 53, 69, 0.3);
+}
+
+.log-viewer.highlight-clamav {
+  border: 3px solid #ffc107;
+  box-shadow: 0 15px 35px rgba(255, 193, 7, 0.3);
+}
+
+.log-viewer.highlight-falco {
+  border: 3px solid #17a2b8;
+  box-shadow: 0 15px 35px rgba(23, 162, 184, 0.3);
+}
+
+.notification {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1em;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.log-viewer h2 {
+  color: #495057;
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 2.5em;
+  font-weight: 700;
+}
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.log-table th, .log-table td {
+  border: none;
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.log-table th {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.log-table tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.log-table tr:hover {
+  background-color: #e3f2fd;
+  transition: background-color 0.3s ease;
+}
+
+.level-error {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.level-warn {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.level-info {
+  color: #17a2b8;
+  font-weight: bold;
+}
+
+.level-debug {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2em;
+  color: #6c757d;
+}
+
+@media (max-width: 768px) {
+  .log-viewer {
+    padding: 15px;
+    max-width: 95%;
+  }
+  .log-viewer h2 {
+    font-size: 1.8em;
+  }
+  .log-table {
+    font-size: 0.9em;
+  }
+  .log-table th, .log-table td {
+    padding: 8px;
+  }
+  .log-table {
+    overflow-x: auto;
+    display: block;
+  }
+}
