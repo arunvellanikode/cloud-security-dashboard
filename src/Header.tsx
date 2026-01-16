@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import SSHWindow from './SSHWindow';
 import './Header.css';
 
 interface Log {
@@ -16,7 +17,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeChange, logs }) => {
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const [sshWindow, setSshWindow] = useState<{ host: string; username: string; port: number } | null>(null);
+  const handleSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onLogTypeChange(e.target.value);
   };
 
@@ -32,6 +34,14 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleSSHClick = (sshUrl: string) => {
+    const url = new URL(sshUrl);
+    const username = url.username;
+    const host = url.hostname;
+    const port = parseInt(url.port) || 22;
+    setSshWindow({ host, username, port });
   };
 
   return (
@@ -77,13 +87,21 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
         <div className="category">
           <label>🔐 SSH Access</label>
           <p>Direct SSH connections to your AWS EC2 instances for server management and troubleshooting. Quick access to 5 configured servers.</p>
-          <a href="ssh://ubuntu@172.31.28.18" className="button" target="_blank">🖥️ Agent 1</a>
-          <a href="ssh://ubuntu@172.31.18.207" className="button" target="_blank">🖥️ Agent 2</a>
-          <a href="ssh://admin@172.31.84.36" className="button" target="_blank">🖥️ Server 3</a>
-          <a href="ssh://ubuntu@172.31.18.26" className="button" target="_blank">🖥️ Server 4</a>
-          <a href="ssh://ubuntu@172.31.85.154" className="button" target="_blank">🖥️ Server 5</a>
+          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.28.18')}>🖥️ Agent 1</button>
+          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.18.207')}>🖥️ Agent 2</button>
+          <button className="button" onClick={() => handleSSHClick('ssh://admin@172.31.84.36')}>🖥️ Server 3</button>
+          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.18.26')}>🖥️ Server 4</button>
+          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.85.154')}>🖥️ Server 5</button>
         </div>
       </nav>
+      {sshWindow && (
+        <SSHWindow
+          host={sshWindow.host}
+          username={sshWindow.username}
+          port={sshWindow.port}
+          onClose={() => setSshWindow(null)}
+        />
+      )}
     </header>
   );
 };

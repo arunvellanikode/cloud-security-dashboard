@@ -1,0 +1,67 @@
+.ssh-window-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.ssh-window {
+  background-color: #000;
+  border-radius: 8px;
+  width: 90%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.ssh-window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.ssh-window-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  background-color: #555;
+  border-radius: 50%;
+}
+
+.ssh-terminal {
+  flex: 1;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.ssh-terminal .xterm {
+  height: 100%;
+  width: 100%;
+}
