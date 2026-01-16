@@ -71,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
         <div className="category">
           <label>📊 Dashboards</label>
           <p>Access external security dashboards for comprehensive threat analysis. Includes Wazuh for security information and event management, and OpenVAS for vulnerability scanning.</p>
-          <a href="http://172.31.18.26/" className="button" target="_blank">📊 Wazuh</a>
+          <a href="https://172.31.18.26/" className="button" target="_blank">📊 Wazuh</a>
           <a href="http://172.31.85.154:9392/" className="button" target="_blank">📊 OpenVAS</a>
         </div>
         <div className="category">
