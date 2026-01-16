@@ -91,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
           <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.18.207')}>🖥️ Agent 2</button>
           <button className="button" onClick={() => handleSSHClick('ssh://admin@172.31.84.36')}>🖥️ Server 3</button>
           <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.18.26')}>🖥️ Server 4</button>
-          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.85.154')}>🖥️ Server 5</button>
+          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@98.93.200.121')}>🖥️ Server 5</button>
         </div>
       </nav>
       {sshWindow && (
