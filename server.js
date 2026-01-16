@@ -1,10 +1,14 @@
-const WebSocket = require('ws');
-const { Client } = require('ssh2');
-const fs = require('fs');
-const path = require('path');
+import { WebSocketServer } from 'ws';
+import { Client } from 'ssh2';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // WebSocket server for SSH
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocketServer({ port: 8080 });
 
 wss.on('connection', (ws, req) => {
   const url = new URL(req.url, 'http://localhost');
