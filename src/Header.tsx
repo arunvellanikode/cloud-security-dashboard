@@ -77,11 +77,11 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
         <div className="category">
           <label>🔐 SSH Access</label>
           <p>Direct SSH connections to your AWS EC2 instances for server management and troubleshooting. Quick access to 5 configured servers.</p>
-          <a href="ssh://ec2-user@server2" className="button" target="_blank">🖥️ Agent 1</a>
-          <a href="ssh://ec2-user@server2" className="button" target="_blank">🖥️ Agent 2</a>
-          <a href="ssh://ec2-user@server3" className="button" target="_blank">🖥️ Server 3</a>
-          <a href="ssh://ec2-user@server4" className="button" target="_blank">🖥️ Server 4</a>
-          <a href="ssh://ec2-user@server5" className="button" target="_blank">🖥️ Server 5</a>
+          <a href="ssh://ubuntu@172.31.28.18" className="button" target="_blank">🖥️ Agent 1</a>
+          <a href="ssh://ubuntu@172.31.18.207" className="button" target="_blank">🖥️ Agent 2</a>
+          <a href="ssh://admin@172.31.84.36" className="button" target="_blank">🖥️ Server 3</a>
+          <a href="ssh://ubuntu@172.31.18.26" className="button" target="_blank">🖥️ Server 4</a>
+          <a href="ssh://ubuntu@172.31.85.154" className="button" target="_blank">🖥️ Server 5</a>
         </div>
       </nav>
     </header>
