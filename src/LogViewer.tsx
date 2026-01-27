@@ -24,8 +24,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ selectedLogType, setLogs: setPare
 
   const fetchLogs = async () => {
     try {
-      // Replace with your actual log server API endpoint
-      const response = await fetch('https://your-log-server-api.com/logs');
+      const response = await fetch('http://localhost:3000/api/logs');
       if (!response.ok) {
         throw new Error('Failed to fetch logs');
       }

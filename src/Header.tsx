@@ -36,6 +36,20 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
     document.body.removeChild(link);
   };
 
+  const handleDownloadRemoteLogs = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/download-logs');
+      if (!response.ok) {
+        throw new Error('Failed to download remote logs');
+      }
+      alert('Remote logs downloaded successfully');
+      // Refresh logs
+      window.location.reload();
+    } catch (error) {
+      alert('Error downloading remote logs: ' + error.message);
+    }
+  };
+
   const handleSSHClick = (sshUrl: string) => {
     const url = new URL(sshUrl);
     const username = url.username;
@@ -57,11 +71,15 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
       <nav>
         <div className="category">
           <label>📋 Log Sources</label>
-          <p>Select which security logs to view and filter. Options include Suricata (network intrusion detection), ClamAV (antivirus scanning), and Falco (runtime security monitoring).</p>
+          <p>Select which security logs to view and filter. Options include Wazuh (security information and event management), Suricata (network intrusion detection), ClamAV (antivirus scanning), and Falco (runtime security monitoring).</p>
           <div className="radio-group">
             <label>
               <input type="radio" name="logs" value="" checked={selectedLogType === ""} onChange={handleSelectChange} />
               All Logs
+            </label>
+            <label>
+              <input type="radio" name="logs" value="wazuh" checked={selectedLogType === "wazuh"} onChange={handleSelectChange} />
+              Wazuh
             </label>
             <label>
               <input type="radio" name="logs" value="suricata" checked={selectedLogType === "suricata"} onChange={handleSelectChange} />
@@ -77,6 +95,7 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
             </label>
           </div>
           <button className="button download" onClick={handleDownload}>📥 Download Logs</button>
+          <button className="button download" onClick={handleDownloadRemoteLogs}>📥 Download Remote Logs</button>
         </div>
         <div className="category">
           <label>📊 Dashboards</label>
