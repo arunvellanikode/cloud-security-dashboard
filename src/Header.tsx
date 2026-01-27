@@ -42,11 +42,33 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
       if (!response.ok) {
         throw new Error('Failed to download remote logs');
       }
-      alert('Remote logs downloaded successfully');
+      
+      // Fetch analytics after downloading
+      const analyticsResponse = await fetch('http://localhost:3000/api/analytics');
+      if (analyticsResponse.ok) {
+        const analyticsData = await analyticsResponse.json();
+        
+        // Create CSV with analytics data
+        const csvContent = 'data:text/csv;charset=utf-8,' +
+          'Agent,Source,Total Alerts,Critical,Warning,Info,Success Rate,Last Update\n' +
+          analyticsData.map((item: any) => 
+            `${item.agent},${item.source},${item.totalAlerts},${item.criticalCount},${item.warningCount},${item.infoCount},${item.successRate}%,${new Date(item.lastUpdate).toLocaleString()}`
+          ).join('\n');
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `analytics_report_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      
+      alert('Remote logs downloaded and analytics report generated successfully');
       // Refresh logs
       window.location.reload();
     } catch (error) {
-      alert('Error downloading remote logs: ' + error.message);
+      alert('Error downloading remote logs: ' + (error instanceof Error ? error.message : String(error)));
     }
   };
 

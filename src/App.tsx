@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Login from './Login'
 import LogViewer from './LogViewer'
+import Analytics from './Analytics'
 import Header from './Header'
 import Welcome from './Welcome'
 import './App.css'
@@ -35,6 +36,7 @@ function App() {
         <>
           <Welcome />
           <Header onLogout={handleLogout} selectedLogType={selectedLogType} onLogTypeChange={handleLogTypeChange} logs={logs} />
+          <Analytics logs={logs} />
           <LogViewer selectedLogType={selectedLogType} setLogs={setLogs} />
         </>
       ) : (
