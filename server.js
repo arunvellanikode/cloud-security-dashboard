@@ -25,6 +25,7 @@ if (!fs.existsSync(tempDir)) {
 }
 
 // Function to recursively download files from a directory URL
+// Only downloads text/log files to save memory
 async function downloadLogsFromUrl(baseUrl, localDir) {
   try {
     const response = await axios.get(baseUrl);
@@ -44,14 +45,17 @@ async function downloadLogsFromUrl(baseUrl, localDir) {
         }
         await downloadLogsFromUrl(fullUrl, dirPath);
       } else {
-        // File
-        const fileResponse = await axios.get(fullUrl, { responseType: 'stream' });
-        const writer = fs.createWriteStream(localPath);
-        fileResponse.data.pipe(writer);
-        await new Promise((resolve, reject) => {
-          writer.on('finish', resolve);
-          writer.on('error', reject);
-        });
+        // File - only download text/log files
+        const isLogFile = /\.(log|txt|json)$/i.test(link);
+        if (isLogFile) {
+          const fileResponse = await axios.get(fullUrl, { responseType: 'stream' });
+          const writer = fs.createWriteStream(localPath);
+          fileResponse.data.pipe(writer);
+          await new Promise((resolve, reject) => {
+            writer.on('finish', resolve);
+            writer.on('error', reject);
+          });
+        }
       }
     }
   } catch (error) {
@@ -80,67 +84,83 @@ app.get('/api/download-logs', async (req, res) => {
 });
 
 // Function to parse logs from downloaded files
+// Optimized to limit memory usage
 function parseLogs() {
   const logs = [];
+  const maxTotalLogs = 50000; // Limit total logs to prevent memory overflow
   
   function readDirRecursive(dir) {
+    if (logs.length >= maxTotalLogs) return; // Stop if we've reached limit
+    
     const items = fs.readdirSync(dir);
     for (const item of items) {
+      if (logs.length >= maxTotalLogs) return; // Stop if we've reached limit
+      
       const fullPath = path.join(dir, item);
       const stat = fs.statSync(fullPath);
       if (stat.isDirectory()) {
         readDirRecursive(fullPath);
-      } else {
-        // Read file and parse logs
-        const content = fs.readFileSync(fullPath, 'utf8');
-        const lines = content.split('\n').filter(line => line.trim());
-        
-        for (const line of lines) {
-          try {
-            let logEntry = null;
+      } else if (/\.(log|txt|json)$/i.test(fullPath)) {
+        // Only process text/log files
+        try {
+          const content = fs.readFileSync(fullPath, 'utf8');
+          const lines = content.split('\n').filter(line => line.trim());
+          
+          // Limit lines per file to prevent memory issues
+          const maxLinesPerFile = 5000;
+          const linesToProcess = lines.slice(0, maxLinesPerFile);
+          
+          for (const line of linesToProcess) {
+            if (logs.length >= maxTotalLogs) return; // Stop if we've reached limit
             
-            // Try to parse as JSON (Wazuh, Suricata)
             try {
-              const json = JSON.parse(line);
-              let source = 'unknown';
-              if (json.rule && json.rule.groups) {
-                source = 'wazuh';
-              } else if (json.event_type === 'alert' || json.event_type === 'http' || json.event_type === 'dns') {
-                source = 'suricata';
-              } else if (json.action === 'FOUND' || json.action === 'OK') {
-                source = 'clamav';
-              }
+              let logEntry = null;
               
-              logEntry = {
-                timestamp: json.timestamp || json.time || new Date().toISOString(),
-                level: json.level || json.rule?.level || json.alert?.severity || 'info',
-                message: json.message || json.rule?.description || json.alert?.signature || JSON.stringify(json),
-                source: source
-              };
-            } catch {
-              // Not JSON, parse as text log (ClamAV)
-              // Assume format: timestamp level message
-              const parts = line.split(' ');
-              if (parts.length >= 3) {
+              // Try to parse as JSON (Wazuh, Suricata)
+              try {
+                const json = JSON.parse(line);
                 let source = 'unknown';
-                if (line.includes('FOUND') || line.includes('OK')) {
+                if (json.rule && json.rule.groups) {
+                  source = 'wazuh';
+                } else if (json.event_type === 'alert' || json.event_type === 'http' || json.event_type === 'dns') {
+                  source = 'suricata';
+                } else if (json.action === 'FOUND' || json.action === 'OK') {
                   source = 'clamav';
                 }
+                
                 logEntry = {
-                  timestamp: parts[0] + ' ' + parts[1],
-                  level: parts[2],
-                  message: parts.slice(3).join(' '),
+                  timestamp: json.timestamp || json.time || new Date().toISOString(),
+                  level: json.level || json.rule?.level || json.alert?.severity || 'info',
+                  message: json.message || json.rule?.description || json.alert?.signature || JSON.stringify(json),
                   source: source
                 };
+              } catch {
+                // Not JSON, parse as text log (ClamAV)
+                // Assume format: timestamp level message
+                const parts = line.split(' ');
+                if (parts.length >= 3) {
+                  let source = 'unknown';
+                  if (line.includes('FOUND') || line.includes('OK')) {
+                    source = 'clamav';
+                  }
+                  logEntry = {
+                    timestamp: parts[0] + ' ' + parts[1],
+                    level: parts[2],
+                    message: parts.slice(3).join(' '),
+                    source: source
+                  };
+                }
               }
+              
+              if (logEntry) {
+                logs.push(logEntry);
+              }
+            } catch (error) {
+              console.error(`Error parsing line: ${line}`, error);
             }
-            
-            if (logEntry) {
-              logs.push(logEntry);
-            }
-          } catch (error) {
-            console.error(`Error parsing line: ${line}`, error);
           }
+        } catch (error) {
+          console.error(`Error reading file ${fullPath}:`, error);
         }
       }
     }
