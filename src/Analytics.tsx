@@ -63,6 +63,28 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
     document.body.removeChild(link);
   };
 
+  const handleReanalyze = async () => {
+    setLoading(true);
+    try {
+      const resp = await fetch('http://localhost:3000/api/reanalyze', { method: 'POST' });
+      if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(text || 'Re-analysis failed');
+      }
+      const body = await resp.json();
+      if (body.analytics) {
+        setAnalyticsData(body.analytics);
+      } else {
+        // Fallback to fetching analytics
+        await fetchAnalytics();
+      }
+    } catch (err) {
+      console.error('Error re-analyzing logs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return <div className="analytics-loading">Loading analytics...</div>;
   }
@@ -71,9 +93,14 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
     <div className="analytics-section">
       <div className="analytics-header">
         <h2>📊 Security Analytics Report</h2>
-        <button className="button download-analytics" onClick={handleDownloadAnalytics}>
-          📥 Download Report
-        </button>
+        <div className="analytics-header-actions">
+          <button className="button download-analytics" onClick={handleDownloadAnalytics}>
+            📥 Download Report
+          </button>
+          <button className="button reanalyze" onClick={handleReanalyze}>
+            🔁 Re-analyze
+          </button>
+        </div>
       </div>
       
       <div className="analytics-summary">

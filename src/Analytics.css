@@ -23,6 +23,12 @@
   letter-spacing: 0.5px;
 }
 
+.analytics-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .download-analytics {
   background-color: #4caf50;
   color: white;
@@ -47,6 +53,24 @@
   padding: 40px;
   color: #888;
   font-size: 16px;
+}
+
+.reanalyze {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);
+}
+
+.reanalyze:hover {
+  background-color: #1565c0;
+  transform: translateY(-2px);
 }
 
 .analytics-summary {

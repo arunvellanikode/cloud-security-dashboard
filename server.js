@@ -343,7 +343,15 @@ function getEnhancedAnalytics() {
 app.get('/api/analytics', (req, res) => {
   try {
     activityStatus.message = 'Generating analytics...';
+    activityStatus.isActive = true;
+    activityStatus.currentActivity = 'analyzing';
+    activityStatus.startTime = new Date();
+    activityStatus.progress = 60;
     const analytics = getEnhancedAnalytics();
+    activityStatus.progress = 100;
+    activityStatus.isActive = false;
+    activityStatus.currentActivity = 'idle';
+    activityStatus.message = 'Analytics generated';
     res.json(analytics);
   } catch (error) {
     console.error('Error calculating analytics:', error);
@@ -353,6 +361,31 @@ app.get('/api/analytics', (req, res) => {
       error: error.message,
       status: activityStatus
     });
+  }
+});
+
+// API endpoint to trigger a manual re-analysis
+app.post('/api/reanalyze', (req, res) => {
+  try {
+    activityStatus.isActive = true;
+    activityStatus.currentActivity = 'analyzing';
+    activityStatus.progress = 50;
+    activityStatus.message = 'Re-analysis started';
+    activityStatus.startTime = new Date();
+
+    const analytics = getEnhancedAnalytics();
+
+    activityStatus.progress = 100;
+    activityStatus.isActive = false;
+    activityStatus.currentActivity = 'idle';
+    activityStatus.message = 'Re-analysis complete';
+
+    res.json({ message: 'Re-analysis complete', analytics, status: activityStatus });
+  } catch (error) {
+    activityStatus.isActive = false;
+    activityStatus.error = error.message;
+    activityStatus.message = `Error during re-analysis: ${error.message}`;
+    res.status(500).json({ error: error.message, status: activityStatus });
   }
 });
 
