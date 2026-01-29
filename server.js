@@ -28,8 +28,8 @@ let activityStatus = {
 app.use(cors());
 app.use(express.json());
 
-// Create temp directory for downloads
-const tempDir = path.join(__dirname, 'temp_logs');
+// Create temp directory for downloads in the project root
+const tempDir = path.join(process.cwd(), 'temp_logs');
 if (!fs.existsSync(tempDir)) {
   fs.mkdirSync(tempDir, { recursive: true });
 }
@@ -390,9 +390,32 @@ app.post('/api/reanalyze', (req, res) => {
 });
 
 // WebSocket server for SSH
-const wss = new WebSocketServer({ port: 8080 });
+let wss;
+const tryStartWSS = (ports) => {
+  for (const p of ports) {
+    try {
+      const server = new WebSocketServer({ port: p });
+      console.log(`SSH WebSocket server running on port ${p}`);
+      return server;
+    } catch (err) {
+      if (err && err.code === 'EADDRINUSE') {
+        console.warn(`Port ${p} in use, trying next port`);
+        continue;
+      }
+      console.error('Failed to start WebSocket server:', err);
+      break;
+    }
+  }
+  console.error('Could not start WebSocket server on any port');
+  return null;
+};
 
-wss.on('connection', (ws, req) => {
+// Only start the SSH WebSocket server when explicitly enabled to avoid port conflicts
+if (process.env.START_WSS === 'true') {
+  wss = tryStartWSS([process.env.WS_PORT ? Number(process.env.WS_PORT) : 8080, 8081]);
+
+  if (wss) {
+  wss.on('connection', (ws, req) => {
   const url = new URL(req.url, 'http://localhost');
   const host = url.searchParams.get('host');
   const username = url.searchParams.get('username');
@@ -447,9 +470,13 @@ wss.on('connection', (ws, req) => {
     privateKey: fs.readFileSync(path.join(__dirname, 'keyfile', 'NewPem.pem')),
     // For demo, assuming no passphrase
   });
-});
-
-console.log('SSH WebSocket server running on port 8080');
+  });
+  } else {
+    console.warn('SSH WebSocket server not started due to port conflicts');
+  }
+} else {
+  console.log('SSH WebSocket server disabled (START_WSS != "true")');
+}
 
 // Start Express server
 app.listen(PORT, () => {
