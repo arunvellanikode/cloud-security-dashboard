@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SSHWindow from './SSHWindow';
 import './Header.css';
 
@@ -7,6 +7,15 @@ interface Log {
   level: string;
   message: string;
   source: string;
+}
+
+interface ActivityStatus {
+  isActive: boolean;
+  currentActivity: string;
+  progress: number;
+  message: string;
+  error: string | null;
+  startTime: string | null;
 }
 
 interface HeaderProps {
@@ -18,6 +27,34 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeChange, logs }) => {
   const [sshWindow, setSshWindow] = useState<{ host: string; username: string; port: number } | null>(null);
+  const [status, setStatus] = useState<ActivityStatus>({
+    isActive: false,
+    currentActivity: 'idle',
+    progress: 0,
+    message: 'Ready',
+    error: null,
+    startTime: null
+  });
+
+  // Poll for status updates
+  useEffect(() => {
+    if (!status.isActive) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/status');
+        if (response.ok) {
+          const statusData = await response.json();
+          setStatus(statusData);
+        }
+      } catch (error) {
+        console.error('Error fetching status:', error);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [status.isActive]);
+
   const handleSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onLogTypeChange(e.target.value);
   };
@@ -38,11 +75,27 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
 
   const handleDownloadRemoteLogs = async () => {
     try {
+      setStatus({
+        isActive: true,
+        currentActivity: 'downloading',
+        progress: 0,
+        message: 'Starting download...',
+        error: null,
+        startTime: new Date().toISOString()
+      });
+
       const response = await fetch('http://localhost:3000/api/download-logs');
       if (!response.ok) {
         throw new Error('Failed to download remote logs');
       }
       
+      setStatus({
+        ...status,
+        currentActivity: 'analyzing',
+        progress: 75,
+        message: 'Analyzing downloaded logs...'
+      });
+
       // Fetch analytics after downloading
       const analyticsResponse = await fetch('http://localhost:3000/api/analytics');
       if (analyticsResponse.ok) {
@@ -64,11 +117,29 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
         document.body.removeChild(link);
       }
       
+      setStatus({
+        isActive: false,
+        currentActivity: 'idle',
+        progress: 100,
+        message: 'Download and analysis complete',
+        error: null,
+        startTime: null
+      });
+
       alert('Remote logs downloaded and analytics report generated successfully');
       // Refresh logs
       window.location.reload();
     } catch (error) {
-      alert('Error downloading remote logs: ' + (error instanceof Error ? error.message : String(error)));
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setStatus({
+        isActive: false,
+        currentActivity: 'idle',
+        progress: 0,
+        message: `Error: ${errorMessage}`,
+        error: errorMessage,
+        startTime: null
+      });
+      alert('Error downloading remote logs: ' + errorMessage);
     }
   };
 
@@ -122,6 +193,26 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
           </div>
           <button className="button download" onClick={handleDownload}>📥 Download Logs</button>
           <button className="button download" onClick={handleDownloadRemoteLogs}>📥 Download Remote Logs</button>
+          
+          {status.isActive && (
+            <div className="activity-status">
+              <div className="status-header">
+                <span className="status-activity">⏳ {status.currentActivity.toUpperCase()}</span>
+                <span className="status-progress">{Math.round(status.progress)}%</span>
+              </div>
+              <div className="status-message">{status.message}</div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${status.progress}%` }}></div>
+              </div>
+            </div>
+          )}
+          
+          {status.error && (
+            <div className="activity-error">
+              <span className="error-icon">❌</span>
+              <span className="error-message">{status.error}</span>
+            </div>
+          )}
         </div>
         <div className="category">
           <label>📊 Dashboards</label>

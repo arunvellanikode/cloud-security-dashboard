@@ -14,6 +14,16 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3000;
 
+// Global status tracking
+let activityStatus = {
+  isActive: false,
+  currentActivity: 'idle',
+  progress: 0,
+  message: 'Ready',
+  error: null,
+  startTime: null
+};
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -66,9 +76,21 @@ async function downloadLogsFromUrl(baseUrl, localDir) {
 // API endpoint to download logs
 app.get('/api/download-logs', async (req, res) => {
   try {
+    activityStatus.isActive = true;
+    activityStatus.currentActivity = 'downloading';
+    activityStatus.progress = 0;
+    activityStatus.message = 'Starting log download...';
+    activityStatus.error = null;
+    activityStatus.startTime = new Date();
+
     const urls = ['http://172.31.28.18/log1/', 'http://172.31.18.207/log2/', 'http://172.31.85.154/log3/'];
+    let urlIndex = 0;
     
     for (const url of urls) {
+      urlIndex++;
+      activityStatus.message = `Downloading logs from ${url}... (${urlIndex}/${urls.length})`;
+      activityStatus.progress = (urlIndex / urls.length) * 50; // First 50% for downloading
+      
       const urlObj = new URL(url);
       const localDir = path.join(tempDir, urlObj.hostname + urlObj.pathname.replace(/\/$/, ''));
       if (!fs.existsSync(localDir)) {
@@ -77,10 +99,40 @@ app.get('/api/download-logs', async (req, res) => {
       await downloadLogsFromUrl(url, localDir);
     }
     
-    res.json({ message: 'Logs downloaded successfully' });
+    activityStatus.currentActivity = 'analyzing';
+    activityStatus.message = 'Analyzing downloaded logs...';
+    activityStatus.progress = 50;
+
+    res.json({ 
+      message: 'Logs downloaded successfully',
+      status: {
+        isActive: false,
+        currentActivity: 'idle',
+        progress: 100,
+        message: 'Download and analysis complete'
+      }
+    });
+
+    // Mark activity as complete
+    activityStatus.isActive = false;
+    activityStatus.currentActivity = 'idle';
+    activityStatus.progress = 100;
+    activityStatus.message = 'Download and analysis complete';
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    activityStatus.isActive = false;
+    activityStatus.currentActivity = 'idle';
+    activityStatus.error = error.message;
+    activityStatus.message = `Error: ${error.message}`;
+    res.status(500).json({ 
+      error: error.message,
+      status: activityStatus
+    });
   }
+});
+
+// API endpoint to get current activity status
+app.get('/api/status', (req, res) => {
+  res.json(activityStatus);
 });
 
 // Function to parse logs from downloaded files
@@ -89,6 +141,9 @@ function parseLogs() {
   const logs = [];
   const maxTotalLogs = 50000; // Limit total logs to prevent memory overflow
   
+  if (activityStatus.isActive) {
+    activityStatus.message = 'Parsing and analyzing logs...';
+  }  
   function readDirRecursive(dir) {
     if (logs.length >= maxTotalLogs) return; // Stop if we've reached limit
     
@@ -287,11 +342,17 @@ function getEnhancedAnalytics() {
 // API endpoint to get analytics
 app.get('/api/analytics', (req, res) => {
   try {
+    activityStatus.message = 'Generating analytics...';
     const analytics = getEnhancedAnalytics();
     res.json(analytics);
   } catch (error) {
     console.error('Error calculating analytics:', error);
-    res.status(500).json({ error: error.message });
+    activityStatus.error = error.message;
+    activityStatus.message = `Error in analytics: ${error.message}`;
+    res.status(500).json({ 
+      error: error.message,
+      status: activityStatus
+    });
   }
 });
 
