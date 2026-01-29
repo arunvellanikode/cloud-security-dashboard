@@ -62,7 +62,7 @@ async function downloadLogsFromUrl(baseUrl, localDir) {
 // API endpoint to download logs
 app.get('/api/download-logs', async (req, res) => {
   try {
-    const urls = ['http://172.31.28.18/log1/', 'http://172.31.18.207/log2/'];
+    const urls = ['http://172.31.28.18/log1/', 'http://172.31.18.207/log2/', 'http://172.31.85.154/log3/'];
     
     for (const url of urls) {
       const urlObj = new URL(url);
@@ -230,10 +230,10 @@ function calculateAnalytics() {
   return analytics;
 }
 
-// Ensure we have Wazuh, Suricata, and ClamAV analytics for both agents
+// Ensure we have Wazuh, Suricata, ClamAV, Falco, and OpenVAS-GVM analytics for both agents
 function getEnhancedAnalytics() {
   const baseAnalytics = calculateAnalytics();
-  const sources = ['wazuh', 'suricata', 'clamav'];
+  const sources = ['wazuh', 'suricata', 'clamav', 'falco', 'openvas-gvm'];
   const agents = ['Agent 1', 'Agent 2'];
   const analyticsMap = {};
 

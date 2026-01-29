@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
       <nav>
         <div className="category">
           <label>📋 Log Sources</label>
-          <p>Select which security logs to view and filter. Options include Wazuh (security information and event management), Suricata (network intrusion detection), ClamAV (antivirus scanning), and Falco (runtime security monitoring).</p>
+          <p>Select which security logs to view and filter. Options include Wazuh (security information and event management), Suricata (network intrusion detection), ClamAV (antivirus scanning), Falco (runtime security monitoring), and OpenVAS-GVM (vulnerability scanning).</p>
           <div className="radio-group">
             <label>
               <input type="radio" name="logs" value="" checked={selectedLogType === ""} onChange={handleSelectChange} />
@@ -114,6 +114,10 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
             <label>
               <input type="radio" name="logs" value="falco" checked={selectedLogType === "falco"} onChange={handleSelectChange} />
               Falco
+            </label>
+            <label>
+              <input type="radio" name="logs" value="openvas-gvm" checked={selectedLogType === "openvas-gvm"} onChange={handleSelectChange} />
+              OpenVAS-GVM
             </label>
           </div>
           <button className="button download" onClick={handleDownload}>📥 Download Logs</button>

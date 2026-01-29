@@ -21,8 +21,21 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    downloadLogs();
     fetchAnalytics();
   }, [logs]);
+
+  const downloadLogs = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/download-logs');
+      if (!response.ok) {
+        throw new Error('Failed to download logs');
+      }
+      await response.json();
+    } catch (error) {
+      console.error('Error downloading logs:', error);
+    }
+  };
 
   const fetchAnalytics = async () => {
     try {
