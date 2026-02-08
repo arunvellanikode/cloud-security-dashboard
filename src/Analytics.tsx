@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 Arun B (arunvellanikode) and Amal J Krishnan (jetblackwing)
+ */
+
 import React, { useState, useEffect } from 'react';
 import './Analytics.css';
 

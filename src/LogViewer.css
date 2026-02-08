@@ -10,6 +10,10 @@
   color: black !important;
 }
 
+/* SPDX-License-Identifier: MIT
+  Copyright (c) 2026 Arun B (arunvellanikode) and Amal J Krishnan (jetblackwing)
+*/
+
 .log-viewer.highlight-suricata {
   border: 3px solid #dc3545;
   box-shadow: 0 15px 35px rgba(220, 53, 69, 0.3);

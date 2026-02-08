@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 Arun B (arunvellanikode) and Amal J Krishnan (jetblackwing)
+ */
+
 import { WebSocketServer } from 'ws';
 import { Client } from 'ssh2';
 import fs from 'fs';

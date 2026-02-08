@@ -1,3 +1,8 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 Arun B (arunvellanikode) and Amal J Krishnan (jetblackwing)
+ */
+
 import { useState } from 'react'
 import Login from './Login'
 import LogViewer from './LogViewer'

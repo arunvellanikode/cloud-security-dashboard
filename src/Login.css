@@ -8,6 +8,10 @@
   backdrop-filter: blur(10px);
 }
 
+/* SPDX-License-Identifier: MIT
+  Copyright (c) 2026 Arun B (arunvellanikode) and Amal J Krishnan (jetblackwing)
+*/
+
 .login-form {
   max-width: 400px;
   padding: 40px;

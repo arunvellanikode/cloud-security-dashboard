@@ -6,6 +6,10 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* SPDX-License-Identifier: MIT
+  Copyright (c) 2026 Arun B (arunvellanikode) and Amal J Krishnan (jetblackwing)
+*/
+
 .top-bar {
   display: flex;
   justify-content: space-between;
