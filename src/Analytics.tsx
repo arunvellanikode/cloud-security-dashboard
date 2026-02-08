@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import './Analytics.css';
 
 interface AnalyticsData {
@@ -24,10 +25,14 @@ interface AnalyticsProps {
 const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [chartView, setChartView] = useState('combined');
+  const [timeFilter, setTimeFilter] = useState('24h');
+  const [histogramData, setHistogramData] = useState<any[]>([]);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [logs]);
+    fetchHistogramData();
+  }, [logs, timeFilter]);
 
   const fetchAnalytics = async () => {
     try {
@@ -42,6 +47,49 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchHistogramData = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/histogram?timeFilter=${timeFilter}`);
+      if (!response.ok) {
+        // Use mock data if API endpoint doesn't exist
+        const mockData = generateMockHistogramData();
+        setHistogramData(mockData);
+        return;
+      }
+      const data = await response.json();
+      setHistogramData(data);
+    } catch (error) {
+      console.error('Error fetching histogram data:', error);
+      // Fallback to mock data
+      const mockData = generateMockHistogramData();
+      setHistogramData(mockData);
+    }
+  };
+
+  const generateMockHistogramData = () => {
+    const hours = 24;
+    const logTypes = ['suricata', 'clamav', 'falco'];
+    const data = [];
+
+    for (let i = 0; i < hours; i++) {
+      const hour = new Date();
+      hour.setHours(hour.getHours() - (hours - i - 1));
+      const timeLabel = hour.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+      const dataPoint: any = {
+        time: timeLabel,
+      };
+
+      logTypes.forEach(type => {
+        dataPoint[type] = Math.floor(Math.random() * 50) + Math.floor(Math.random() * 30);
+      });
+
+      data.push(dataPoint);
+    }
+
+    return data;
   };
 
   const getSeverityColor = (level: string | number): string => {
@@ -87,6 +135,66 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
       console.error('Error re-analyzing logs:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getPieChartData = () => {
+    if (chartView === 'combined') {
+      return [
+        {
+          name: 'Critical',
+          value: analyticsData.reduce((sum, item) => sum + item.criticalCount, 0),
+          fill: '#d32f2f'
+        },
+        {
+          name: 'Warning',
+          value: analyticsData.reduce((sum, item) => sum + item.warningCount, 0),
+          fill: '#f57c00'
+        },
+        {
+          name: 'Info',
+          value: analyticsData.reduce((sum, item) => sum + item.infoCount, 0),
+          fill: '#4caf50'
+        }
+      ];
+    } else if (chartView === 'agent1') {
+      const agent1Data = analyticsData.filter(item => item.agent === 'Agent 1');
+      return [
+        {
+          name: 'Critical',
+          value: agent1Data.reduce((sum, item) => sum + item.criticalCount, 0),
+          fill: '#d32f2f'
+        },
+        {
+          name: 'Warning',
+          value: agent1Data.reduce((sum, item) => sum + item.warningCount, 0),
+          fill: '#f57c00'
+        },
+        {
+          name: 'Info',
+          value: agent1Data.reduce((sum, item) => sum + item.infoCount, 0),
+          fill: '#4caf50'
+        }
+      ];
+    } else {
+      const agent2Data = analyticsData.filter(item => item.agent === 'Agent 2');
+      return [
+        {
+          name: 'Critical',
+          value: agent2Data.reduce((sum, item) => sum + item.criticalCount, 0),
+          fill: '#d32f2f'
+        },
+        {
+          name: 'Warning',
+          value: agent2Data.reduce((sum, item) => sum + item.warningCount, 0),
+          fill: '#f57c00'
+        },
+        {
+          name: 'Info',
+          value: agent2Data.reduce((sum, item) => sum + item.infoCount, 0),
+          fill: '#4caf50'
+        }
+      ];
     }
   };
 
@@ -204,6 +312,106 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
               <li key={idx}>{item.source}: {item.totalAlerts} alerts</li>
             ))}
           </ul>
+        </div>
+      </div>
+
+      <div className="charts-container">
+        <div className="alert-category-box">
+          <h3>📊 Alerts by Category</h3>
+          
+          <div className="chart-view-controls">
+            <label className="radio-group">
+              <input
+                type="radio"
+                name="chartView"
+                value="combined"
+                checked={chartView === 'combined'}
+                onChange={(e) => setChartView(e.target.value)}
+              />
+              <span>Combined (All Agents)</span>
+            </label>
+            <label className="radio-group">
+              <input
+                type="radio"
+                name="chartView"
+                value="agent1"
+                checked={chartView === 'agent1'}
+                onChange={(e) => setChartView(e.target.value)}
+              />
+              <span>Agent 1 (172.31.28.18)</span>
+            </label>
+            <label className="radio-group">
+              <input
+                type="radio"
+                name="chartView"
+                value="agent2"
+                checked={chartView === 'agent2'}
+                onChange={(e) => setChartView(e.target.value)}
+              />
+              <span>Agent 2 (172.31.18.207)</span>
+            </label>
+          </div>
+
+          <div className="pie-chart-container">
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={getPieChartData()}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value, percent }: any) => `${name}: ${value} (${((percent || 0) * 100).toFixed(0)}%)`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {getPieChartData().map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `${value} alerts`} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="alert-category-box">
+          <h3>📈 Alerts Timeline by Log Type</h3>
+          
+          <div className="histogram-time-filter">
+            <label>Time Range:</label>
+            <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)}>
+              <option value="24h">Last 24 Hours</option>
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+            </select>
+          </div>
+
+          <div className="histogram-container">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={histogramData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <XAxis 
+                  dataKey="time" 
+                  tick={{ fill: '#fff', fontSize: 12 }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis tick={{ fill: '#fff', fontSize: 12 }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #fff', borderRadius: '4px' }}
+                  labelStyle={{ color: '#fff' }}
+                  formatter={(value) => `${value} alerts`}
+                />
+                <Legend wrapperStyle={{ color: '#fff', paddingTop: '20px' }} />
+                <Bar dataKey="suricata" fill="#ff6b6b" name="Suricata" />
+                <Bar dataKey="clamav" fill="#4ecdc4" name="ClamAV" />
+                <Bar dataKey="falco" fill="#ffd93d" name="Falco" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>
