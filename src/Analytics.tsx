@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import './Analytics.css';
 
 interface AnalyticsData {
@@ -199,6 +200,48 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
               <li key={idx}>{item.source}: {item.totalAlerts} alerts</li>
             ))}
           </ul>
+        </div>
+      </div>
+
+      <div className="alert-category-box">
+        <h3>📊 Alerts by Category</h3>
+        <div className="pie-chart-container">
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={[
+                  {
+                    name: 'Critical',
+                    value: analyticsData.reduce((sum, item) => sum + item.criticalCount, 0),
+                    fill: '#d32f2f'
+                  },
+                  {
+                    name: 'Warning',
+                    value: analyticsData.reduce((sum, item) => sum + item.warningCount, 0),
+                    fill: '#f57c00'
+                  },
+                  {
+                    name: 'Info',
+                    value: analyticsData.reduce((sum, item) => sum + item.infoCount, 0),
+                    fill: '#4caf50'
+                  }
+                ]}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, value, percent }: any) => `${name}: ${value} (${((percent || 0) * 100).toFixed(0)}%)`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                <Cell fill="#d32f2f" />
+                <Cell fill="#f57c00" />
+                <Cell fill="#4caf50" />
+              </Pie>
+              <Tooltip formatter={(value) => `${value} alerts`} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
