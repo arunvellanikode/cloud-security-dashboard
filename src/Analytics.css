@@ -295,6 +295,48 @@
   text-align: center;
 }
 
+.chart-view-controls {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.radio-group input[type="radio"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #4caf50;
+}
+
+.radio-group span {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.radio-group:hover span {
+  color: #4caf50;
+}
+
+.radio-group input[type="radio"]:checked + span {
+  color: #4caf50;
+  font-weight: 600;
+}
+
 .pie-chart-container {
   display: flex;
   justify-content: center;
@@ -373,6 +415,15 @@
   }
 
   .pie-chart-container text {
+    font-size: 12px;
+  }
+
+  .chart-view-controls {
+    gap: 15px;
+    padding: 10px;
+  }
+
+  .radio-group span {
     font-size: 12px;
   }
 }

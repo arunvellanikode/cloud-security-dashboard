@@ -20,6 +20,7 @@ interface AnalyticsProps {
 const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [chartView, setChartView] = useState('combined');
 
   useEffect(() => {
     fetchAnalytics();
@@ -83,6 +84,66 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
       console.error('Error re-analyzing logs:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getPieChartData = () => {
+    if (chartView === 'combined') {
+      return [
+        {
+          name: 'Critical',
+          value: analyticsData.reduce((sum, item) => sum + item.criticalCount, 0),
+          fill: '#d32f2f'
+        },
+        {
+          name: 'Warning',
+          value: analyticsData.reduce((sum, item) => sum + item.warningCount, 0),
+          fill: '#f57c00'
+        },
+        {
+          name: 'Info',
+          value: analyticsData.reduce((sum, item) => sum + item.infoCount, 0),
+          fill: '#4caf50'
+        }
+      ];
+    } else if (chartView === 'agent1') {
+      const agent1Data = analyticsData.filter(item => item.agent === 'Agent 1');
+      return [
+        {
+          name: 'Critical',
+          value: agent1Data.reduce((sum, item) => sum + item.criticalCount, 0),
+          fill: '#d32f2f'
+        },
+        {
+          name: 'Warning',
+          value: agent1Data.reduce((sum, item) => sum + item.warningCount, 0),
+          fill: '#f57c00'
+        },
+        {
+          name: 'Info',
+          value: agent1Data.reduce((sum, item) => sum + item.infoCount, 0),
+          fill: '#4caf50'
+        }
+      ];
+    } else {
+      const agent2Data = analyticsData.filter(item => item.agent === 'Agent 2');
+      return [
+        {
+          name: 'Critical',
+          value: agent2Data.reduce((sum, item) => sum + item.criticalCount, 0),
+          fill: '#d32f2f'
+        },
+        {
+          name: 'Warning',
+          value: agent2Data.reduce((sum, item) => sum + item.warningCount, 0),
+          fill: '#f57c00'
+        },
+        {
+          name: 'Info',
+          value: agent2Data.reduce((sum, item) => sum + item.infoCount, 0),
+          fill: '#4caf50'
+        }
+      ];
     }
   };
 
@@ -205,27 +266,45 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
 
       <div className="alert-category-box">
         <h3>📊 Alerts by Category</h3>
+        
+        <div className="chart-view-controls">
+          <label className="radio-group">
+            <input
+              type="radio"
+              name="chartView"
+              value="combined"
+              checked={chartView === 'combined'}
+              onChange={(e) => setChartView(e.target.value)}
+            />
+            <span>Combined (All Agents)</span>
+          </label>
+          <label className="radio-group">
+            <input
+              type="radio"
+              name="chartView"
+              value="agent1"
+              checked={chartView === 'agent1'}
+              onChange={(e) => setChartView(e.target.value)}
+            />
+            <span>Agent 1 (172.31.28.18)</span>
+          </label>
+          <label className="radio-group">
+            <input
+              type="radio"
+              name="chartView"
+              value="agent2"
+              checked={chartView === 'agent2'}
+              onChange={(e) => setChartView(e.target.value)}
+            />
+            <span>Agent 2 (172.31.18.207)</span>
+          </label>
+        </div>
+
         <div className="pie-chart-container">
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={[
-                  {
-                    name: 'Critical',
-                    value: analyticsData.reduce((sum, item) => sum + item.criticalCount, 0),
-                    fill: '#d32f2f'
-                  },
-                  {
-                    name: 'Warning',
-                    value: analyticsData.reduce((sum, item) => sum + item.warningCount, 0),
-                    fill: '#f57c00'
-                  },
-                  {
-                    name: 'Info',
-                    value: analyticsData.reduce((sum, item) => sum + item.infoCount, 0),
-                    fill: '#4caf50'
-                  }
-                ]}
+                data={getPieChartData()}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -234,9 +313,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ logs }) => {
                 fill="#8884d8"
                 dataKey="value"
               >
-                <Cell fill="#d32f2f" />
-                <Cell fill="#f57c00" />
-                <Cell fill="#4caf50" />
+                {getPieChartData().map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
               </Pie>
               <Tooltip formatter={(value) => `${value} alerts`} />
               <Legend />
