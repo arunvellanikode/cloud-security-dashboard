@@ -225,9 +225,9 @@ const Header: React.FC<HeaderProps> = ({ onLogout, selectedLogType, onLogTypeCha
           <p>Direct SSH connections to your AWS EC2 instances for server management and troubleshooting. Quick access to 5 configured servers.</p>
           <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.28.18')}>🖥️ Agent 1</button>
           <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.18.207')}>🖥️ Agent 2</button>
-          <button className="button" onClick={() => handleSSHClick('ssh://admin@172.31.84.36')}>🖥️ Server 3</button>
-          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.18.26')}>🖥️ Server 4</button>
-          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.85.154')}>🖥️ Server 5</button>
+          <button className="button" onClick={() => handleSSHClick('ssh://admin@172.31.84.36')}>🖥️ Kali Machine</button>
+          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.18.26')}>🖥️ Wazuh Machine</button>
+          <button className="button" onClick={() => handleSSHClick('ssh://ubuntu@172.31.85.154')}>🖥️ OpenVAS Machine</button>
         </div>
       </nav>
       {sshWindow && (
