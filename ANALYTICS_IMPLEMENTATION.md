@@ -1,7 +1,7 @@
 # Analytics Implementation Summary
 
 ## Overview
-Successfully integrated comprehensive security analytics from Wazuh, Suricata, and ClamAV for both Agent 1 (172.31.28.18) and Agent 2 (172.31.18.207) into the Cloud Security Dashboard.
+Successfully integrated comprehensive security analytics from Wazuh, Suricata, ClamAV, and Falco for both Agent 1 (172.31.28.18) and Agent 2 (172.31.18.207) into the Cloud Security Dashboard.
 
 ## Components Added
 
@@ -24,7 +24,7 @@ Successfully integrated comprehensive security analytics from Wazuh, Suricata, a
 ### 3. **Backend Analytics API** (`server.js`)
 - **`GET /api/analytics`** - Returns analytics data with:
   - Agent identification (Agent 1 or Agent 2)
-  - Security tool (wazuh, suricata, clamav)
+  - Security tool (wazuh, suricata, clamav, falco)
   - Alert counts: total, critical, warning, info
   - Success rate calculation
   - Last update timestamp
@@ -53,7 +53,7 @@ Successfully integrated comprehensive security analytics from Wazuh, Suricata, a
 
 ✅ **Agent 1 & Agent 2 Categories**
   - Dedicated section below header
-  - Shows metrics for each security tool (Wazuh, Suricata, ClamAV) per agent
+  - Shows metrics for each security tool (Wazuh, Suricata, ClamAV, Falco) per agent
   - Summary cards with quick statistics
 
 ✅ **Download Functionality**
@@ -67,6 +67,7 @@ Successfully integrated comprehensive security analytics from Wazuh, Suricata, a
   - Wazuh: Security Information and Event Management (SIEM)
   - Suricata: Network Intrusion Detection System (NIDS)
   - ClamAV: Antivirus and Malware Detection
+  - Falco: Runtime Security Monitoring
 
 ✅ **Log Sources Integration**
   - Existing download functionality now includes analytics data
@@ -81,6 +82,7 @@ Both agents stream logs from:
 - Wazuh logs (JSON format with rule information)
 - Suricata IDS alerts (JSON format with event type)
 - ClamAV scan results (text and JSON format)
+- Falco runtime alerts (JSON/text format)
 
 ## API Endpoints
 

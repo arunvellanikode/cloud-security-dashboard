@@ -2,7 +2,7 @@
 
 ## ✅ Implementation Summary
 
-Your cloud-security-dashboard now includes comprehensive **Security Analytics** for both **Agent 1** and **Agent 2** with real-time metrics from Wazuh, Suricata, and ClamAV.
+Your cloud-security-dashboard now includes comprehensive **Security Analytics** for both **Agent 1** and **Agent 2** with real-time metrics from Wazuh, Suricata, ClamAV, and Falco.
 
 ---
 
@@ -21,6 +21,7 @@ Your cloud-security-dashboard now includes comprehensive **Security Analytics** 
      - Wazuh (Security Information & Event Management)
      - Suricata (Network Intrusion Detection)
      - ClamAV (Antivirus Scanning)
+     - Falco (Runtime Security Monitoring)
    - Per agent: Agent 1 (172.31.28.18) & Agent 2 (172.31.18.207)
 
 ### 3. **Integration with Existing Features**
@@ -44,9 +45,11 @@ Total Alerts    |    Critical    |    Warnings    |    Info    |    Avg Success 
 | Agent 1 | Wazuh         | 425          | 15       | 42       | 368  | 87%          | 2026-01-27  |
 | Agent 1 | Suricata      | 312          | 8        | 31       | 273  | 90%          | 2026-01-27  |
 | Agent 1 | ClamAV        | 185          | 5        | 18       | 162  | 91%          | 2026-01-27  |
+| Agent 1 | Falco         | 96           | 4        | 11       | 81   | 92%          | 2026-01-27  |
 | Agent 2 | Wazuh         | 328          | 12       | 35       | 281  | 88%          | 2026-01-27  |
 | Agent 2 | Suricata      | 267          | 7        | 26       | 234  | 91%          | 2026-01-27  |
 | Agent 2 | ClamAV        | 142          | 3        | 12       | 127  | 92%          | 2026-01-27  |
+| Agent 2 | Falco         | 88           | 3        | 10       | 75   | 93%          | 2026-01-27  |
 
 ---
 
@@ -81,11 +84,11 @@ Total Alerts    |    Critical    |    Warnings    |    Info    |    Avg Success 
 
 ### Agent 1 (172.31.28.18)
 - **Log Location**: `http://172.31.28.18/log1/`
-- **Tools**: Wazuh, Suricata, ClamAV
+- **Tools**: Wazuh, Suricata, ClamAV, Falco
 
 ### Agent 2 (172.31.18.207)
 - **Log Location**: `http://172.31.18.207/log2/`
-- **Tools**: Wazuh, Suricata, ClamAV
+- **Tools**: Wazuh, Suricata, ClamAV, Falco
 
 ---
 

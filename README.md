@@ -10,6 +10,7 @@ A web UI for centralized log management system hosted on AWS. This dashboard eas
   - Wazuh (Security Information and Event Management)
   - Suricata (Network Intrusion Detection)
   - ClamAV (Antivirus Scanning)
+  - Falco (Runtime Security Monitoring)
 - **Analytics Report** showing alerts at a glance for both agents
 - **Table-based Report Display** with critical, warning, and info counts
 - **Export Analytics** to CSV format for compliance and reporting
@@ -39,8 +40,8 @@ A web UI for centralized log management system hosted on AWS. This dashboard eas
 ## Configuration
 
 The dashboard is pre-configured to connect to:
-- **Agent 1**: 172.31.28.18/log1/ (Wazuh, Suricata, ClamAV logs)
-- **Agent 2**: 172.31.18.207/log2/ (Wazuh, Suricata, ClamAV logs)
+- **Agent 1**: 172.31.28.18/log1/ (Wazuh, Suricata, ClamAV, Falco logs)
+- **Agent 2**: 172.31.18.207/log2/ (Wazuh, Suricata, ClamAV, Falco logs)
 
 Update API endpoints in the following files if needed:
 - `src/LogViewer.tsx` - for log fetching
@@ -80,7 +81,7 @@ The log server API should return JSON in the following format:
     "timestamp": "2023-01-01T00:00:00Z",
     "level": "INFO",
     "message": "Log message here",
-    "source": "wazuh|suricata|clamav"
+    "source": "wazuh|suricata|clamav|falco"
   }
 ]
 ```
@@ -122,7 +123,7 @@ The log server API should return JSON in the following format:
 - **Summary Statistics**: Total alerts, critical count, warnings, info count, and average success rate
 - **Analytics Table**: Detailed breakdown by agent and security tool
   - Agent badge (Agent 1 or Agent 2)
-  - Security tool (Wazuh, Suricata, ClamAV)
+  - Security tool (Wazuh, Suricata, ClamAV, Falco)
   - Alert counts by severity
   - Success rate with visual progress bar
   - Last update timestamp
